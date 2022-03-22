@@ -9,10 +9,11 @@ The file should look like this:
 ![Example format](example_format.png)
 
 ## TODO
-- Add GUI.
-- Change file format to SQL.
-- Remove reference to games (generalize to work for all preferences like restaurants).
-- Implement support for comments about the each person's preference.
+- [ ] Add GUI.
+- [ ] Change file format to SQL.
+- [ ] Remove reference to games (generalize to work for all preferences like restaurants).
+- [ ] Implement support for comments about the each person's preference.
+- [ ] Add support for android.
 
 ## License
 Licensed under GPL V3. See [LICENSE](LICENSE) for more details.
