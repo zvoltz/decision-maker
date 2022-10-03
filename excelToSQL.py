@@ -66,6 +66,8 @@ def makeDatabase(file_name):
     # add each item along with everyone's opinion towards that item
     for row in rows:
         addRow(cursor, row)
+    connection.commit()
+    connection.close()
 
 
 def removeCopy(file_name):
