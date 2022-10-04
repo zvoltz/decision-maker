@@ -112,6 +112,10 @@ def show_results(items, max_rating):
         index += 1
 
 
-if __name__ == '__main__':
+def start():
     setup()
     main()
+
+
+if __name__ == '__main__':
+    start()
