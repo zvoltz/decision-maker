@@ -53,15 +53,15 @@ def getData(file):
     return names,
 
 
-def makeDatabase(file_name):
-    removeCopy(file_name)
+def makeDatabase():
+    removeCopy()
     connection = sqlite3.connect(file_name)
     cursor = connection.cursor()
     cursor.execute("CREATE TABLE preferences (object_name TEXT)")
 
     # create a column for each person's preferences
     for cell in names:
-        cursor.execute(f"ALTER TABLE preferences ADD {cell.value} TEXT;")
+        cursor.execute(f"ALTER TABLE preferences ADD {cell.value} SMALLINT(1);")
 
     # add each item along with everyone's opinion towards that item
     for row in rows:
@@ -70,7 +70,7 @@ def makeDatabase(file_name):
     connection.close()
 
 
-def removeCopy(file_name):
+def removeCopy():
     if os.path.exists(file_name):
         os.remove(file_name)
 
@@ -100,6 +100,6 @@ if __name__ == '__main__':
     file_name = getFileName()
     while file_name == "":
         file_name = getFileName()
-    makeDatabase(file_name)
+    makeDatabase()
 
 

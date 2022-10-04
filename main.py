@@ -12,44 +12,95 @@ TODO:
 3. Remove reference to games (generalize to work for all preferences like restaurants)
 4. Implement comment support
 """
-import openpyxl as sheet
+import sqlite3
+import PySimpleGUI as sg
+
+global cursor
 
 
-global rows
-colors = {
-    "FF0000": 0,
-    "FFFF00": 1,
-    "FFFFFF": 2,
-    "000000": 2,
-    "00FF00": 3
-}
+# Set the global cursor to the connected database.
+def setup_SQL():
+    global cursor
+    connection = sqlite3.connect(getFile())
+    cursor = connection.cursor()
 
 
-# Reads all rows of the given file and puts them in the 2D array rows
-def setup():
-    global rows
-    ws = sheet.load_workbook(filename="example_file.xlsx").active
-    rows = list(ws.rows)
+# Get the database to use.
+def getFile():
+    layout = [[sg.Text('Select the database(.db) file:', size=(15, 1)), sg.InputText(), sg.FileBrowse(file_types=((
+                'ALL Files', '*.*db'),))],
+              [sg.Submit(), sg.Cancel()]]
+
+    window = sg.Window('Pick item from database', layout, keep_on_top=True)
+    event, values = window.read()
+    window.close()
+    if event == sg.WIN_CLOSED or event == 'Cancel':
+        exit()
+    return values[0]
 
 
-# Ask the user for all names
-# allows the user to type the same person's name multiple times to increase their influence on the listed items
-def get_people():
-    people = []
-    person = input("Type the first person's name: ")
-    while person != "":
-        people.append(person)
-        person = input("Type the next person's name or press ENTER to stop: ")
-    return people
+# Return a list of the names of the columns after the 0th column
+def get_column_names():
+    cursor.execute("SELECT * FROM preferences")
+    all_arr = list(cursor.description)
+    # remove the 'object name' column
+    all_arr.pop(0)
+    column_names = []
+    # cursor.description returns "returns a 7-tuple for each column where the last six items of each tuple are None."
+    # Remove all the Nones:
+    for tuple7 in all_arr:
+        column_names += tuple7
+    column_names = [x for x in column_names if x]
+
+    return column_names
 
 
-def main():
-    weight_per_name = get_weight_per_name()
-    max_rating = max(colors.values()) * sum(weight_per_name)
+# Given the names of the columns, present the user with a GUI to check which people to consider when making the
+# decision. Returns a list of boolean values that relate to whether that column should be considered where the
+# boolean value at i relates to column i+1.
+def select_people(column_names):
+    layout = [[sg.Text("Check everyone to consider while deciding:")]]
+    for x in column_names:
+        layout.append([sg.Checkbox(x)])
+    layout.append([sg.Button("Submit")])
+    window = sg.Window("Decision Maker", layout)
+    while True:
+        event, values = window.read()
+        if event == sg.WIN_CLOSED or event == 'Cancel':
+            exit()
+        if event == 'Submit':
+            break
+    window.close()
+
+    return list(values.values())
+
+
+# Returns a string of the selected people's names in the form:
+# person1, person2, person3
+# for the purpose of being used in SELECT statements
+def get_people_SQL():
+    column_names = get_column_names()
+    values = select_people(column_names)
+    wanted_names = "object_name"
+    for i in range(len(column_names)):
+        if values[i]:
+            wanted_names += ", " + column_names[i]
+    return wanted_names
+
+
+def main_SQL():
+    global cursor
+    people = get_people_SQL()
+    command = "SELECT " + people + " FROM preferences"
+    res = cursor.execute(command)
+    scores = {}
+    for row in res:
+        scores[row[0]] = sum(row[1:])
+    max_rating = len(people) * 3
     items = prep_list(max_rating)
-    for item in rows:
-        index = max_rating - get_rating(item[1:], weight_per_name)
-        items[index].append(item[0].value)
+    for item in scores.items():
+        index = max_rating - item[1]
+        items[index].append(item[0])
     show_results(items, max_rating)
 
 
@@ -62,41 +113,12 @@ def prep_list(max_rating):
     return preference_list
 
 
-# name weights is how much each person should affect the outcome. It'll be multiplied by their
-# opinion of the item when creating the item ratings.
-# Removes the first row of rows because the names of the people are no longer necessary.
-def get_weight_per_name():
-    people = get_people()
-    weight_per_name = []
-    for name in rows[0]:
-        weight_per_name.append(people.count(name.value))
-    # A1 is blank so the 1st "Name" is blank, pop to remove
-    weight_per_name.pop(0)
-    # First row is the list of the names, remove so the rows are just items
-    rows.pop(0)
-    return weight_per_name
-
-
-# Returns an integer representation of everyone's opinion on that item.
-# Ratings are calculated by multiplying their color coded opinion by their name weight.
-def get_rating(item, weights):
-    score = 0
-    for index in range(len(item)):
-        color = item[index].fill.start_color.index[2:]
-        score += get_color_value(color) * weights[index]
-    return score
-
-
-# Returns an integer representation of a single person's opinion based on the color they put.
-# Checks if the color is valid (see colors dictionary or overview), exits if it is not.
-def get_color_value(color):
-    valid = colors.get(color, None)
-    if valid is None:
-        print("Invalid color in sheet")
-        exit()
-    return valid
-
-
+# Given the items in a 2D array, where index 0 is a list of the highest rated items, print them out in order, starting
+# with the highest score and going down. For example:
+# With a score of [highest score]:
+# ["item1", "item2"]
+# With a score of [2nd highest]:
+# and so on.
 def show_results(items, max_rating):
     cont = ""
     index = 0
@@ -113,5 +135,5 @@ def show_results(items, max_rating):
 
 
 if __name__ == '__main__':
-    setup()
-    main()
+    setup_SQL()
+    main_SQL()
