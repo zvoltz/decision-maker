@@ -89,19 +89,15 @@ def get_people_SQL():
 
 
 def main_SQL():
-    global cursor
     people = get_people_SQL()
     command = "SELECT " + people + " FROM preferences"
     res = cursor.execute(command)
-    scores = {}
-    for row in res:
-        scores[row[0]] = sum(row[1:])
     max_rating = len(people) * 3
     items = prep_list(max_rating)
-    for item in scores.items():
-        index = max_rating - item[1]
-        items[index].append(item[0])
-    show_results(items, max_rating)
+    for row in res:
+        index = max_rating - sum(row[1:])
+        items[index].append(row[0])
+    show_results(items)
 
 
 # Returns a list of size max_rating + 1, each initialized as an empty list
@@ -119,7 +115,7 @@ def prep_list(max_rating):
 # ["item1", "item2"]
 # With a score of [2nd highest]:
 # and so on.
-def show_results(items, max_rating):
+def show_results(items):
     cont = ""
     index = 0
     while cont != "exit":
@@ -132,7 +128,6 @@ def show_results(items, max_rating):
         event = sg.popup_ok_cancel(popup_text, title=f"Decision Maker {index}")
         if event == 'OK':
             index += 1
-            continue
         else:
             break
 
