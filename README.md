@@ -10,10 +10,12 @@ The file should look like this:
 
 ## TODO
 - [ ] Add GUI.
-- [ ] Change file format to SQL.
+- [x] ~~Change file format to SQL.~~
 - [ ] Remove reference to games (generalize to work for all preferences like restaurants).
 - [ ] Implement support for comments about the each person's preference.
 - [ ] Add support for android.
+- [ ] Update README.
+- [ ] Merge SQL branch.
 
 ## License
 Licensed under GPL V3. See [LICENSE](LICENSE) for more details.
