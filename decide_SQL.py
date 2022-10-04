@@ -137,6 +137,10 @@ def show_results(items, max_rating):
             break
 
 
-if __name__ == '__main__':
+def start():
     setup_SQL()
     main_SQL()
+
+
+if __name__ == '__main__':
+    start()
