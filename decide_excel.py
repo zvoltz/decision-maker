@@ -1,19 +1,5 @@
-"""
-Given a file of preferences and a list of names, display the best items according to their preferences
-
-The file is currently an Excel (.xlsx) file with A1 being blank. The rest of the A row is a list of names of people.
-The first column is a list of items. Their intersections are colored cells: red (FF0000) for disliking the item,
-yellow (FFFF00) for neutral, white/black (FFFFFF/000000) for no opinion, and green (00FF00) for liking it.
-Any other colors will cause errors.
-
-TODO:
-1. Add GUI
-2. Add SQL support
-3. Remove reference to games (generalize to work for all preferences like restaurants)
-4. Implement comment support
-"""
 import openpyxl as sheet
-
+import PySimpleGUI as sg
 
 global rows
 colors = {
@@ -25,32 +11,56 @@ colors = {
 }
 
 
+# Show GUI to get and return the absolute path to the Excel file.
+def get_file():
+    layout = [[sg.Text('Select the Excel(.xlsx) file:'), sg.InputText(), sg.FileBrowse(file_types=((
+                'ALL Files', '*.*xlsx'),))],
+              [sg.Submit(), sg.Cancel()]]
+
+    window = sg.Window('Decision Maker', layout, keep_on_top=True)
+
+    event, values = window.read()
+    window.close()
+    if event == sg.WIN_CLOSED or event == 'Cancel':
+        exit()
+    return values[0]
+
+
 # Reads all rows of the given file and puts them in the 2D array rows
 def setup():
     global rows
-    ws = sheet.load_workbook(filename="example_file.xlsx").active
+    ws = sheet.load_workbook(filename=get_file()).active
     rows = list(ws.rows)
 
 
-# Ask the user for all names
-# allows the user to type the same person's name multiple times to increase their influence on the listed items
-def get_people():
-    people = []
-    person = input("Type the first person's name: ")
-    while person != "":
-        people.append(person)
-        person = input("Type the next person's name or press ENTER to stop: ")
-    return people
+# Using the first row of the Excel file, present a GUI checkbox to check who to consider while making the decision.
+# Returns an array of boolean values that relate to the people to consider where array[i] relates to Excel cell
+# A i+2.
+def select_people():
+    layout = [[sg.Text("Check everyone to consider while deciding:")]]
+    for x in rows[0][1:]:
+        layout.append([sg.Checkbox(x.value)])
+    layout.append([sg.Button("Submit")])
+    window = sg.Window("Decision Maker", layout)
+    while True:
+        event, values = window.read()
+        if event == sg.WIN_CLOSED or event == 'Cancel':
+            exit()
+        if event == 'Submit':
+            break
+    window.close()
+    rows.pop(0)
+    return list(values.values())
 
 
 def main():
-    weight_per_name = get_weight_per_name()
-    max_rating = max(colors.values()) * sum(weight_per_name)
+    people = select_people()
+    max_rating = max(colors.values()) * sum(people)
     items = prep_list(max_rating)
     for item in rows:
-        index = max_rating - get_rating(item[1:], weight_per_name)
+        index = max_rating - get_rating(item[1:], people)
         items[index].append(item[0].value)
-    show_results(items, max_rating)
+    show_results(items)
 
 
 # Returns a list of size max_rating + 1, each initialized as an empty list
@@ -60,21 +70,6 @@ def prep_list(max_rating):
     for rank in range(max_rating + 1):
         preference_list.append([])
     return preference_list
-
-
-# name weights is how much each person should affect the outcome. It'll be multiplied by their
-# opinion of the item when creating the item ratings.
-# Removes the first row of rows because the names of the people are no longer necessary.
-def get_weight_per_name():
-    people = get_people()
-    weight_per_name = []
-    for name in rows[0]:
-        weight_per_name.append(people.count(name.value))
-    # A1 is blank so the 1st "Name" is blank, pop to remove
-    weight_per_name.pop(0)
-    # First row is the list of the names, remove so the rows are just items
-    rows.pop(0)
-    return weight_per_name
 
 
 # Returns an integer representation of everyone's opinion on that item.
@@ -92,12 +87,15 @@ def get_rating(item, weights):
 def get_color_value(color):
     valid = colors.get(color, None)
     if valid is None:
-        print("Invalid color in sheet")
+        sg.popup_error("Invalid color in sheet")
         exit()
     return valid
 
 
-def show_results(items, max_rating):
+# Given the items in a 2D array, where index 0 is a list of the highest rated items, display them in order, starting
+# with the highest score and going down. The GUI shows all items with equal rank in the same window, and each new window
+# indicates a single decrease in rank and a single increase in index unless an index has no items to display.
+def show_results(items):
     cont = ""
     index = 0
     while cont != "exit":
@@ -106,10 +104,12 @@ def show_results(items, max_rating):
         if not items[index]:
             index += 1
             continue
-        print(f"With a score of {max_rating - index}:")
-        print(items[index])
-        cont = input("Press ENTER to see the next best list or type exit to exit: ")
-        index += 1
+        popup_text = ", ".join(items[index]).replace("\'", "")
+        event = sg.popup_ok_cancel(popup_text, title=f"Decision Maker {index}")
+        if event == 'OK':
+            index += 1
+        else:
+            break
 
 
 def start():

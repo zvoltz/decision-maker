@@ -15,8 +15,9 @@ global rows
 global names
 
 
-def getFile():
-    layout = [[sg.Text('Select the excel file:', size=(15, 1)), sg.InputText(), sg.FileBrowse(file_types=((
+# Show GUI to get and return the absolute path to the Excel file.
+def get_file():
+    layout = [[sg.Text('Select the Excel(.xlsx) file:'), sg.InputText(), sg.FileBrowse(file_types=((
                 'ALL Files', '*.*xlsx'),))],
               [sg.Submit(), sg.Cancel()]]
 
@@ -29,7 +30,8 @@ def getFile():
     return values[0]
 
 
-def getFileName():
+# Show GUI to get and return the name of the new database file.
+def get_file_name():
     layout = [[sg.InputText(), sg.FileSaveAs(file_types=(('ALL Files', '*.db'),), default_extension='*.db')],
               [sg.Submit(), sg.Cancel()]]
 
@@ -42,19 +44,21 @@ def getFileName():
     return values[0]
 
 
-def getData(file):
+# Using the previously set excel_file variable, set global names and rows appropriately.
+# rows becomes a list of items and preferences with no names row.
+# names becomes a list of names, removing the first blank cell.
+def get_data():
     global rows
     global names
-    ws = sheet.load_workbook(filename=file).active
+    ws = sheet.load_workbook(filename=excel_file).active
     rows = list(ws.rows)
     names = list(rows[0])
     names.pop(0)
     rows.pop(0)
-    return names,
 
 
-def makeDatabase():
-    removeCopy()
+def make_database():
+    remove_copy()
     connection = sqlite3.connect(file_name)
     cursor = connection.cursor()
     cursor.execute("CREATE TABLE preferences (object_name TEXT)")
@@ -65,17 +69,18 @@ def makeDatabase():
 
     # add each item along with everyone's opinion towards that item
     for row in rows:
-        addRow(cursor, row)
+        add_row(cursor, row)
     connection.commit()
     connection.close()
 
 
-def removeCopy():
+# Check if a database file exists in the given path. If one does, delete it.
+def remove_copy():
     if os.path.exists(file_name):
         os.remove(file_name)
 
 
-def addRow(cursor, row):
+def add_row(cursor, row):
     data = ["'" + str(row[0].value) + "'"]
     numQuestions = "?, " * (len(row))
     numQuestions = numQuestions[0:-2]
@@ -93,13 +98,11 @@ def get_color_value(cell):
 
 
 if __name__ == '__main__':
-    excel_file = getFile()
+    excel_file = get_file()
     while excel_file == "":
-        excel_file = getFile()
-    getData(excel_file)
-    file_name = getFileName()
+        excel_file = get_file()
+    get_data()
+    file_name = get_file_name()
     while file_name == "":
-        file_name = getFileName()
-    makeDatabase()
-
-
+        file_name = get_file_name()
+    make_database()
