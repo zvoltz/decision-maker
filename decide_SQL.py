@@ -1,17 +1,3 @@
-"""
-Given a file of preferences and a list of names, display the best items according to their preferences
-
-The file is currently an Excel (.xlsx) file with A1 being blank. The rest of the A row is a list of names of people.
-The first column is a list of items. Their intersections are colored cells: red (FF0000) for disliking the item,
-yellow (FFFF00) for neutral, white/black (FFFFFF/000000) for no opinion, and green (00FF00) for liking it.
-Any other colors will cause errors.
-
-TODO:
-1. Add GUI
-2. Add SQL support
-3. Remove reference to games (generalize to work for all preferences like restaurants)
-4. Implement comment support
-"""
 import sqlite3
 import PySimpleGUI as sg
 
@@ -90,6 +76,7 @@ def get_people_SQL():
 
 def main_SQL():
     people = get_people_SQL()
+    # possible SQL injection
     command = "SELECT " + people + " FROM preferences"
     res = cursor.execute(command)
     max_rating = len(people) * 3
@@ -109,12 +96,9 @@ def prep_list(max_rating):
     return preference_list
 
 
-# Given the items in a 2D array, where index 0 is a list of the highest rated items, print them out in order, starting
-# with the highest score and going down. For example:
-# With a score of [highest score]:
-# ["item1", "item2"]
-# With a score of [2nd highest]:
-# and so on.
+# Given the items in a 2D array, where index 0 is a list of the highest rated items, display them in order, starting
+# with the highest score and going down. The GUI shows all items with equal rank in the same window, and each new window
+# indicates a single decrease in rank and a single increase in index unless an index has no items to display.
 def show_results(items):
     cont = ""
     index = 0

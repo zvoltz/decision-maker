@@ -7,12 +7,12 @@ yellow (FFFF00) for neutral, white/black (FFFFFF/000000) for no opinion, and gre
 Any other colors will cause errors.
 
 TODO:
-1. Add GUI
-2. Add SQL support
-3. Remove reference to games (generalize to work for all preferences like restaurants)
-4. Implement comment support
-5. Add way to make a new database from scratch.
-6. Add support for android.
+1. Add GUI.
+2. Remove reference to games (generalize to work for all preferences like restaurants).
+3. Implement support for comments about each person's preference.
+4. Add support for android.
+5. Update README.
+6. Add way to make a new database from scratch.
 """
 import PySimpleGUI as sg
 
