@@ -59,7 +59,7 @@ def main():
     items = prep_list(max_rating)
     for item in rows:
         index = max_rating - get_rating(item[1:], people)
-        items[index].append(item[0].value)
+        items[index].append(str(item[0].value))
     show_results(items)
 
 
@@ -104,7 +104,7 @@ def show_results(items):
         if not items[index]:
             index += 1
             continue
-        popup_text = ", ".join(items[index]).replace("\'", "")
+        popup_text = ", ".join(items[index])
         event = sg.popup_ok_cancel(popup_text, title=f"Decision Maker {index}")
         if event == 'OK':
             index += 1
