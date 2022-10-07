@@ -79,7 +79,7 @@ def main_SQL():
     # possible SQL injection
     command = "SELECT " + people + " FROM preferences"
     res = cursor.execute(command)
-    max_rating = len(people) * 3
+    max_rating = people.count(',') * 3
     items = prep_list(max_rating)
     for row in res:
         index = max_rating - sum(row[1:])
@@ -100,11 +100,8 @@ def prep_list(max_rating):
 # with the highest score and going down. The GUI shows all items with equal rank in the same window, and each new window
 # indicates a single decrease in rank and a single increase in index unless an index has no items to display.
 def show_results(items):
-    cont = ""
     index = 0
-    while cont != "exit":
-        if index >= len(items):
-            return
+    while index < len(items):
         if not items[index]:
             index += 1
             continue
