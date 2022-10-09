@@ -109,7 +109,7 @@ def show_results(items):
             index += 1
             continue
         popup_text = ", ".join(items[index])
-        layout = [[sg.Text(popup_text)], [sg.Button("Back"), sg.Button("Next"), sg.Button("Cancel")]]
+        layout = [[sg.Multiline(popup_text, s=(150, 2))], [sg.Button("Back"), sg.Button("Next"), sg.Button("Cancel")]]
         window = sg.Window("Decision Maker", layout)
         while True:
             event, values = window.read()
