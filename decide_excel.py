@@ -105,11 +105,22 @@ def show_results(items):
             index += 1
             continue
         popup_text = ", ".join(items[index])
-        event = sg.popup_ok_cancel(popup_text, title=f"Decision Maker {index}")
-        if event == 'OK':
-            index += 1
-        else:
-            break
+        layout = [[sg.Text(popup_text)], [sg.Button("Back"), sg.Button("Next"), sg.Button("Cancel")]]
+        window = sg.Window("Decision Maker", layout)
+        while True:
+            event, values = window.read()
+            if event == sg.WIN_CLOSED or event == 'Cancel':
+                exit()
+            if event == 'Back':
+                index -= 1
+                window.close()
+                break
+            if event == 'Next':
+                index += 1
+                window.close()
+                break
+            else:
+                break
 
 
 def start():

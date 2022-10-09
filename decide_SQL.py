@@ -100,17 +100,31 @@ def prep_list(max_rating):
 # with the highest score and going down. The GUI shows all items with equal rank in the same window, and each new window
 # indicates a single decrease in rank and a single increase in index unless an index has no items to display.
 def show_results(items):
+    cont = ""
     index = 0
-    while index < len(items):
+    while cont != "exit":
+        if index >= len(items):
+            return
         if not items[index]:
             index += 1
             continue
-        popup_text = ", ".join(items[index]).replace("\'", "")
-        event = sg.popup_ok_cancel(popup_text, title=f"Decision Maker {index}")
-        if event == 'OK':
-            index += 1
-        else:
-            break
+        popup_text = ", ".join(items[index])
+        layout = [[sg.Text(popup_text)], [sg.Button("Back"), sg.Button("Next"), sg.Button("Cancel")]]
+        window = sg.Window("Decision Maker", layout)
+        while True:
+            event, values = window.read()
+            if event == sg.WIN_CLOSED or event == 'Cancel':
+                exit()
+            if event == 'Back':
+                index -= 1
+                window.close()
+                break
+            if event == 'Next':
+                index += 1
+                window.close()
+                break
+            else:
+                break
 
 
 def start():
