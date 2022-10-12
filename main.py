@@ -16,16 +16,67 @@ TODO:
 """
 import PySimpleGUI as sg
 
-layout = [[sg.Text("Do you have an Excel(.xlsx) or database (.db) to decide from?")],
-          [sg.Button("Excel"), sg.Button("Database")]]
-window = sg.Window("Select File Type", layout)
-event, values = window.read()
-window.close()
-if event == sg.WIN_CLOSED or event == 'Cancel':
-    exit()
-elif event == "Excel":
-    import decide_excel
-    decide_excel.start()
-elif event == "Database":
+
+# Show GUI to get and return the absolute path to the Excel file.
+def get_file():
+    layout = [[sg.Text('Select the Excel(.xlsx) or database(.db) file:'), sg.InputText(), sg.FileBrowse(file_types=((
+                'ALL Files', '*.*xlsx'), ('ALL Files', '*.*db')))],
+              [sg.Submit(), sg.Cancel()]]
+
+    window = sg.Window('Decision Maker', layout, keep_on_top=True)
+
+    event, values = window.read()
+    window.close()
+    if event == sg.WIN_CLOSED or event == 'Cancel':
+        exit()
+    return values[0]
+
+
+def run_decider():
+    file = get_file()
+    if file[-3:] == '.db':
+        call_SQL(file)
+    elif file[-5:] == '.xlsx':
+        call_excel(file)
+    else:
+        error()
+
+
+def call_SQL(file):
     import decide_SQL
-    decide_SQL.start()
+    import sqlite3
+    connection = sqlite3.connect(file)
+    cursor = connection.cursor()
+    decide_SQL.set_cursor(cursor)
+    decide_SQL.main_SQL()
+
+
+def call_excel(file):
+    import decide_excel
+    import openpyxl as sheet
+    ws = sheet.load_workbook(filename=file).active
+    decide_excel.set_rows(list(ws.rows))
+    decide_excel.main()
+
+
+def error():
+    sg.popup_error("File not recognized")
+    run_decider()
+
+
+if __name__ == '__main__':
+    run_decider()
+
+# layout = [[sg.Text("Do you have an Excel(.xlsx) or database (.db) to decide from?")],
+#           [sg.Button("Excel"), sg.Button("Database")]]
+# window = sg.Window("Select File Type", layout)
+# event, values = window.read()
+# window.close()
+# if event == sg.WIN_CLOSED or event == 'Cancel':
+#     exit()
+# elif event == "Excel":
+#     import decide_excel
+#     decide_excel.start()
+# elif event == "Database":
+#     import decide_SQL
+#     decide_SQL.start()

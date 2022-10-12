@@ -11,6 +11,13 @@ def setup_SQL():
     cursor = connection.cursor()
 
 
+# Instead of doing setup_SQL and getting the file here, used to set the global cursor before calling main_SQL(). Takes
+# a sqlite3 cursor as a parameter.
+def set_cursor(cursor_param):
+    global cursor
+    cursor = cursor_param
+
+
 # Get the database to use.
 def getFile():
     layout = [[sg.Text('Select the database(.db) file:'), sg.InputText(), sg.FileBrowse(file_types=((

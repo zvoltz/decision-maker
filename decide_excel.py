@@ -33,6 +33,13 @@ def setup():
     rows = list(ws.rows)
 
 
+# Instead of calling setup() and getting the file here, used to set the global rows before calling main(). Takes a list
+# of rows from an Excel file.
+def set_rows(rows_param):
+    global rows
+    rows = rows_param
+
+
 # Using the first row of the Excel file, present a GUI checkbox to check who to consider while making the decision.
 # Returns an array of boolean values that relate to the people to consider where array[i] relates to Excel cell
 # A i+2.
