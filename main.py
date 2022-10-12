@@ -44,19 +44,12 @@ def run_decider():
 
 def call_SQL(file):
     import decide_SQL
-    import sqlite3
-    connection = sqlite3.connect(file)
-    cursor = connection.cursor()
-    decide_SQL.set_cursor(cursor)
-    decide_SQL.main_SQL()
+    decide_SQL.start(file)
 
 
 def call_excel(file):
     import decide_excel
-    import openpyxl as sheet
-    ws = sheet.load_workbook(filename=file).active
-    decide_excel.set_rows(list(ws.rows))
-    decide_excel.main()
+    decide_excel.start(file)
 
 
 def error():
@@ -66,17 +59,3 @@ def error():
 
 if __name__ == '__main__':
     run_decider()
-
-# layout = [[sg.Text("Do you have an Excel(.xlsx) or database (.db) to decide from?")],
-#           [sg.Button("Excel"), sg.Button("Database")]]
-# window = sg.Window("Select File Type", layout)
-# event, values = window.read()
-# window.close()
-# if event == sg.WIN_CLOSED or event == 'Cancel':
-#     exit()
-# elif event == "Excel":
-#     import decide_excel
-#     decide_excel.start()
-# elif event == "Database":
-#     import decide_SQL
-#     decide_SQL.start()

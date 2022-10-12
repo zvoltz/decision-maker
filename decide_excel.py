@@ -27,17 +27,12 @@ def get_file():
 
 
 # Reads all rows of the given file and puts them in the 2D array rows
-def setup():
+def setup(file=None):
     global rows
-    ws = sheet.load_workbook(filename=get_file()).active
+    if file is None:
+        file = get_file()
+    ws = sheet.load_workbook(filename=file).active
     rows = list(ws.rows)
-
-
-# Instead of calling setup() and getting the file here, used to set the global rows before calling main(). Takes a list
-# of rows from an Excel file.
-def set_rows(rows_param):
-    global rows
-    rows = rows_param
 
 
 # Using the first row of the Excel file, present a GUI checkbox to check who to consider while making the decision.
@@ -127,8 +122,8 @@ def show_window(text):
             return 1
 
 
-def start():
-    setup()
+def start(file=None):
+    setup(file)
     main()
 
 
