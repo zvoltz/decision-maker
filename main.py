@@ -35,21 +35,13 @@ def get_file():
 def run_decider():
     file = get_file()
     if file[-3:] == '.db':
-        call_SQL(file)
+        from decide_SQL import SQLDecider
+        SQLDecider(file)
     elif file[-5:] == '.xlsx':
-        call_excel(file)
+        from decide_excel import ExcelDecider
+        ExcelDecider(file)
     else:
         error()
-
-
-def call_SQL(file):
-    import decide_SQL
-    decide_SQL.start(file)
-
-
-def call_excel(file):
-    import decide_excel
-    decide_excel.start(file)
 
 
 def error():
