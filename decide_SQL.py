@@ -7,14 +7,14 @@ class SQLDecider(Decider):
     cursor = None
 
     # Set the cursor to the connected database.
-    def setup_SQL(self, file=None):
+    def setup(self, file=None):
         if file is None:
             self.get_file()
         connection = sqlite3.connect(file)
         self.cursor = connection.cursor()
 
     # Return a list of the names of the columns after the 0th column
-    def get_column_names(self):
+    def get_names(self):
         self.cursor.execute("SELECT * FROM preferences")
         all_arr = list(self.cursor.description)
         # remove the 'object name' column
@@ -31,8 +31,8 @@ class SQLDecider(Decider):
     # Returns a string of the selected people's names in the form:
     # person1, person2, person3
     # for the purpose of being used in SELECT statements
-    def get_people_SQL(self):
-        column_names = self.get_column_names()
+    def get_people(self):
+        column_names = self.get_names()
         values = self.select_people(column_names)
         wanted_names = "object_name"
         for i in range(len(column_names)):
@@ -40,10 +40,10 @@ class SQLDecider(Decider):
                 wanted_names += ", " + column_names[i]
         return wanted_names
 
-    def main_SQL(self, file=None):
+    def main(self, file=None):
         if not self.cursor:
-            self.setup_SQL(file)
-        people = self.get_people_SQL()
+            self.setup(file)
+        people = self.get_people()
         # possible SQL injection
         command = "SELECT " + people + " FROM preferences"
         res = self.cursor.execute(command)
@@ -56,7 +56,7 @@ class SQLDecider(Decider):
 
     def __init__(self, file=None):
         super().__init__()
-        self.main_SQL(file)
+        self.main(file)
 
 
 if __name__ == '__main__':
