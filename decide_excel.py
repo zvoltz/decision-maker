@@ -1,5 +1,4 @@
 import openpyxl as sheet
-import PySimpleGUI as sg
 from decider_parent import Decider
 
 
@@ -53,8 +52,7 @@ class ExcelDecider(Decider):
     def get_color_value(self, color):
         valid = self.colors.get(color, None)
         if valid is None:
-            sg.popup_error("Invalid color in sheet")
-            exit()
+            self.show_error("Invalid color in sheet")
         return valid
 
     def __init__(self, file=None):

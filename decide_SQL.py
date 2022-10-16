@@ -1,5 +1,4 @@
 import sqlite3
-import PySimpleGUI as sg
 from decider_parent import Decider
 
 

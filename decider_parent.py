@@ -70,6 +70,14 @@ class Decider:
             case 'Next':
                 return 1
 
+    # Given an error message, pop up an error window and exit.
+    def show_error(self, error=None):
+        if error is not None:
+            sg.popup_error(error)
+        else:
+            sg.popup_error("Unspecified error")
+        exit()
+
     def __init__(self):
         pass
 
