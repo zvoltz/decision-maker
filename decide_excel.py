@@ -34,8 +34,10 @@ class ExcelDecider(Decider):
         max_rating = max(self.colors.values()) * sum(people)
         items = self.prep_list(max_rating)
         for item in self.rows:
-            index = max_rating - self.get_rating(item[1:], people)
-            items[index].append(str(item[0].value))
+            object_name = str(item[0].value).strip()
+            if object_name is not None and not "":
+                index = max_rating - self.get_rating(item[1:], people)
+                items[index].append(object_name)
         self.show_results(items)
 
     # Returns an integer representation of everyone's opinion on that item.
@@ -50,10 +52,7 @@ class ExcelDecider(Decider):
     # Returns an integer representation of a single person's opinion based on the color they put.
     # Checks if the color is valid (see colors dictionary or overview), exits if it is not.
     def get_color_value(self, color):
-        valid = self.colors.get(color, None)
-        if valid is None:
-            self.show_error("Invalid color in sheet")
-        return valid
+        return self.colors.get(color, 2)
 
     def __init__(self, file=None):
         super().__init__()

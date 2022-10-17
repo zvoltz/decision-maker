@@ -58,7 +58,7 @@ class Decider:
     # Given the text to show as string of items, display them as a multiline GUI. Returns either -1 or 1 based on what
     # the user selects. This integer represents whether the integer wants to see the previous index (-1) or next (+1).
     def show_window(self, text):
-        layout = [[sg.Multiline(text, s=(150, 2))], [sg.Button("Back"), sg.Button("Next"), sg.Button("Cancel")]]
+        layout = [[sg.Multiline(text, s=(100, 2))], [sg.Button("Back"), sg.Button("Next"), sg.Button("Cancel")]]
         window = sg.Window("Decision Maker", layout)
         event, values = window.read()
         window.close()
@@ -66,6 +66,7 @@ class Decider:
             case sg.WIN_CLOSED | 'Cancel':
                 exit()
             case 'Back':
+                # TODO: allow going back more than 1 index
                 return -1
             case 'Next':
                 return 1
@@ -75,7 +76,7 @@ class Decider:
         if error is not None:
             sg.popup_error(error)
         else:
-            sg.popup_error("Unspecified error")
+            sg.popup_error("An error has occurred")
         exit()
 
     def __init__(self):
