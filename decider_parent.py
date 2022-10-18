@@ -49,11 +49,13 @@ class Decider:
     # window indicates a single decrease in rank and a single increase in index unless an index has no items to display.
     def show_results(self, items):
         index = 0
+        next_addition = 0
         while index < len(items):
             if not items[index]:
-                index += 1
+                index += next_addition if index >= 0 else 1
                 continue
-            index += self.show_window(", ".join(items[index]))
+            next_addition = self.show_window(", ".join(items[index]))
+            index += next_addition
 
     # Given the text to show as string of items, display them as a multiline GUI. Returns either -1 or 1 based on what
     # the user selects. This integer represents whether the integer wants to see the previous index (-1) or next (+1).
@@ -66,7 +68,6 @@ class Decider:
             case sg.WIN_CLOSED | 'Cancel':
                 exit()
             case 'Back':
-                # TODO: allow going back more than 1 index
                 return -1
             case 'Next':
                 return 1
