@@ -1,8 +1,8 @@
 import openpyxl as sheet
-from decider_parent import Decider
+import decider_parent
 
 
-class ExcelDecider(Decider):
+class ExcelDecider(decider_parent.Decider):
     rows = []
     colors = {
         "FF0000": 0,
@@ -15,7 +15,7 @@ class ExcelDecider(Decider):
     # Reads all rows of the given file and puts them in the 2D array rows
     def setup(self, file=None):
         if file is None:
-            file = self.get_file()
+            file = decider_parent.get_file()
         ws = sheet.load_workbook(filename=file).active
         self.rows = list(ws.rows)
 
