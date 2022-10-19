@@ -14,26 +14,11 @@ TODO:
 5. Update README.
 6. Add way to make a new database from scratch.
 """
-import PySimpleGUI as sg
-
-
-# Show GUI to get and return the absolute path to the Excel file.
-def get_file():
-    layout = [[sg.Text('Select the Excel(.xlsx) or database(.db) file:'), sg.InputText(), sg.FileBrowse(file_types=((
-                'ALL Files', '*.*xlsx'), ('ALL Files', '*.*db')))],
-              [sg.Submit(), sg.Cancel()]]
-
-    window = sg.Window('Decision Maker', layout, keep_on_top=True)
-
-    event, values = window.read()
-    window.close()
-    if event == sg.WIN_CLOSED or event == 'Cancel':
-        exit()
-    return values[0]
 
 
 def run_decider():
-    file = get_file()
+    import decider_parent
+    file = decider_parent.get_file()
     if file[-3:] == '.db':
         from decide_SQL import SQLDecider
         SQLDecider(file)
@@ -41,12 +26,7 @@ def run_decider():
         from decide_excel import ExcelDecider
         ExcelDecider(file)
     else:
-        error()
-
-
-def error():
-    sg.popup_error("File not recognized")
-    run_decider()
+        decider_parent.show_error("File not recognized")
 
 
 if __name__ == '__main__':
