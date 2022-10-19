@@ -1,14 +1,14 @@
 import sqlite3
-from decider_parent import Decider
+import decider_parent
 
 
-class SQLDecider(Decider):
+class SQLDecider(decider_parent.Decider):
     cursor = None
 
     # Set the cursor to the connected database.
     def setup(self, file=None):
         if file is None:
-            self.get_file()
+            decider_parent.get_file()
         connection = sqlite3.connect(file)
         self.cursor = connection.cursor()
 
