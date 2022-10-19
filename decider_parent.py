@@ -1,21 +1,31 @@
 import PySimpleGUI as sg
 
 
+# Given an error message, pop up an error window and exit.
+def show_error(error=None):
+    if error is not None:
+        sg.popup_error(error)
+    else:
+        sg.popup_error("An error has occurred")
+    exit()
+
+
+# Show GUI to get and return the absolute path to the Excel(.xlsx) or database(.db) file.
+def get_file():
+    layout = [[sg.Text('Select the Excel(.xlsx) file:'), sg.InputText(), sg.FileBrowse(file_types=((
+                'ALL Files', '*.*xlsx'),))],
+              [sg.Submit(), sg.Cancel()]]
+
+    window = sg.Window('Decision Maker', layout, keep_on_top=True)
+
+    event, values = window.read()
+    window.close()
+    if event == sg.WIN_CLOSED or event == 'Cancel':
+        exit()
+    return values[0]
+
+
 class Decider:
-
-    # Show GUI to get and return the absolute path to the Excel file.
-    def get_file(self):
-        layout = [[sg.Text('Select the Excel(.xlsx) file:'), sg.InputText(), sg.FileBrowse(file_types=((
-                    'ALL Files', '*.*xlsx'),))],
-                  [sg.Submit(), sg.Cancel()]]
-
-        window = sg.Window('Decision Maker', layout, keep_on_top=True)
-
-        event, values = window.read()
-        window.close()
-        if event == sg.WIN_CLOSED or event == 'Cancel':
-            exit()
-        return values[0]
 
     # Given the names of the columns, present the user with a GUI to check which people to consider when making the
     # decision. Returns a list of boolean values that relate to whether that column should be considered where the
@@ -71,14 +81,6 @@ class Decider:
                 return -1
             case 'Next':
                 return 1
-
-    # Given an error message, pop up an error window and exit.
-    def show_error(self, error=None):
-        if error is not None:
-            sg.popup_error(error)
-        else:
-            sg.popup_error("An error has occurred")
-        exit()
 
     def __init__(self):
         pass
