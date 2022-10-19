@@ -23,7 +23,11 @@ class ExcelDecider(decider_parent.Decider):
     # Returns the names as a list of strings.
     def get_names(self):
         # First cell is blank, ignore it
-        names = [x.value for x in self.rows[0][1:]]
+        names = []
+        for cell in self.rows[0][1:]:
+            if cell.value is None:
+                break
+            names.append(cell.value)
         self.rows.pop(0)
         return names
 
@@ -44,7 +48,7 @@ class ExcelDecider(decider_parent.Decider):
     # Ratings are calculated by multiplying their color coded opinion by their name weight.
     def get_rating(self, item, weights):
         score = 0
-        for index in range(len(item)):
+        for index in range(len(weights)):
             color = item[index].fill.start_color.index[2:]
             score += self.get_color_value(color) * weights[index]
         return score
