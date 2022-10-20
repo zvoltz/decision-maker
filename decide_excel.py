@@ -20,7 +20,7 @@ class ExcelDecider(decider_parent.Decider):
         self.rows = list(ws.rows)
 
     # Return the list of names from the instance variable rows, then pop the first row.
-    # Returns the names as a list of strings.
+    # Returns the names as a list of strings. Stops looking after a cell is none.
     def get_names(self):
         # First cell is blank, ignore it
         names = []
@@ -54,7 +54,7 @@ class ExcelDecider(decider_parent.Decider):
         return score
 
     # Returns an integer representation of a single person's opinion based on the color they put.
-    # Checks if the color is valid (see colors dictionary or overview), exits if it is not.
+    # Checks if the color is valid (see colors dictionary or overview), defaults to 2.
     def get_color_value(self, color):
         return self.colors.get(color, 2)
 
