@@ -12,8 +12,8 @@ def show_error(error=None):
 
 # Show GUI to get and return the absolute path to the Excel(.xlsx) or database(.db) file.
 def get_file():
-    layout = [[sg.Text('Select the Excel(.xlsx) file:'), sg.InputText(), sg.FileBrowse(file_types=((
-                'ALL Files', '*.*xlsx'),))],
+    layout = [[sg.Text('Select the Excel(.xlsx) or database(.db) file:'), sg.InputText(), sg.FileBrowse(file_types=((
+                'ALL Files', '*.*xlsx'), ('ALL Files', '*.*db')))],
               [sg.Submit(), sg.Cancel()]]
 
     window = sg.Window('Decision Maker', layout, keep_on_top=True)
