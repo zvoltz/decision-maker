@@ -7,6 +7,9 @@ class SQLDecider(decider_parent.Decider):
 
     # Set the cursor to the connected database.
     def setup(self, file=None):
+        if self.cursor:
+            # Already setup
+            return
         if file is None:
             decider_parent.get_file()
         connection = sqlite3.connect(file)
@@ -40,8 +43,7 @@ class SQLDecider(decider_parent.Decider):
         return wanted_names
 
     def main(self, file=None):
-        if not self.cursor:
-            self.setup(file)
+        self.setup(file)
         people = self.get_people()
         # possible SQL injection
         command = "SELECT " + people + " FROM preferences"
