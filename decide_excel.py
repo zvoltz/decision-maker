@@ -14,6 +14,9 @@ class ExcelDecider(decider_parent.Decider):
 
     # Reads all rows of the given file and puts them in the 2D array rows
     def setup(self, file=None):
+        if self.rows:
+            # Already setup
+            return
         if file is None:
             file = decider_parent.get_file()
         ws = sheet.load_workbook(filename=file).active
@@ -32,8 +35,7 @@ class ExcelDecider(decider_parent.Decider):
         return names
 
     def main(self, file=None):
-        if not self.rows:
-            self.setup(file)
+        self.setup(file)
         people = self.select_people(self.get_names())
         max_rating = max(self.colors.values()) * sum(people)
         items = self.prep_list(max_rating)
