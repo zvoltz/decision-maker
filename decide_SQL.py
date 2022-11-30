@@ -30,29 +30,31 @@ class SQLDecider(decider_parent.Decider):
 
         return column_names
 
-    # Returns a string of the selected people's names in the form:
-    # person1, person2, person3
-    # for the purpose of being used in SELECT statements
-    def get_people(self):
-        column_names = self.get_names()
-        values = self.select_people(column_names)
+    # Given all the people to be considered, parse the data and return a list of items sorted such that the highest
+    # rated items are at index 0, next highest are index 1, and so on.
+    def parse_data(self, selected_people):
+        all_items = self.select_SQL(selected_people)
+        max_rating = len(selected_people) * 3
+        sorted_items = self.prep_list(max_rating)
+        for row in all_items:
+            index = max_rating - sum(row[1:])
+            sorted_items[index].append(row[0])
+        return sorted_items
+
+    # Given a list of names to consider, select them from the connected SQL database, and return the result.
+    def select_SQL(self, selected_people):
         wanted_names = "object_name"
-        for i in range(len(column_names)):
-            if values[i]:
-                wanted_names += ", " + column_names[i]
-        return wanted_names
+        for i in range(len(selected_people)):
+            wanted_names += ", " + selected_people[i]
+        # TODO: fix SQL injection
+        command = "SELECT " + wanted_names + " FROM preferences"
+        return self.cursor.execute(command)
 
     def main(self, file=None):
         self.setup(file)
-        people = self.get_people()
-        # possible SQL injection
-        command = "SELECT " + people + " FROM preferences"
-        res = self.cursor.execute(command)
-        max_rating = people.count(',') * 3
-        items = self.prep_list(max_rating)
-        for row in res:
-            index = max_rating - sum(row[1:])
-            items[index].append(row[0])
+        people = self.get_names()
+        people = self.select_people(people)
+        items = self.parse_data(people)
         self.show_results(items)
 
     def __init__(self, file=None):
