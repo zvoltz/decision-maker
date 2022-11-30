@@ -34,9 +34,7 @@ class ExcelDecider(decider_parent.Decider):
         self.rows.pop(0)
         return names
 
-    def main(self, file=None):
-        self.setup(file)
-        people = self.select_people(self.get_names())
+    def parse_data(self, people):
         max_rating = max(self.colors.values()) * sum(people)
         items = self.prep_list(max_rating)
         for item in self.rows:
@@ -44,6 +42,13 @@ class ExcelDecider(decider_parent.Decider):
             if object_name is not None and not "":
                 index = max_rating - self.get_rating(item[1:], people)
                 items[index].append(object_name)
+        return items
+
+    def main(self, file=None):
+        self.setup(file)
+        people = self.get_names()
+        people = self.select_people(people)
+        items = self.parse_data(people)
         self.show_results(items)
 
     # Returns an integer representation of everyone's opinion on that item.
