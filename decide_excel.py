@@ -22,7 +22,7 @@ class ExcelDecider(decider_parent.Decider):
         ws = sheet.load_workbook(filename=file).active
         self.rows = list(ws.rows)
 
-    # Return the list of names from the instance variable rows, then pop the first row.
+    # Return the list of all names from the instance variable rows.
     # Returns the names as a list of strings. Stops looking after a cell is none.
     def get_names(self):
         # First cell is blank, ignore it
@@ -31,13 +31,12 @@ class ExcelDecider(decider_parent.Decider):
             if cell.value is None:
                 break
             names.append(cell.value)
-        self.rows.pop(0)
         return names
 
     def parse_data(self, people):
-        max_rating = max(self.colors.values()) * sum(people)
+        max_rating = max(self.colors.values()) * len(people)
         items = self.prep_list(max_rating)
-        for item in self.rows:
+        for item in self.rows[1:]:
             object_name = str(item[0].value).strip()
             if object_name is not None and not "":
                 index = max_rating - self.get_rating(item[1:], people)
@@ -52,12 +51,13 @@ class ExcelDecider(decider_parent.Decider):
         self.show_results(items)
 
     # Returns an integer representation of everyone's opinion on that item.
-    # Ratings are calculated by multiplying their color coded opinion by their name weight.
-    def get_rating(self, item, weights):
+    # Ratings are calculated by adding the correlated color value of all selected people.
+    def get_rating(self, item, selected_people):
         score = 0
-        for index in range(len(weights)):
-            color = item[index].fill.start_color.index[2:]
-            score += self.get_color_value(color) * weights[index]
+        for index in range(len(self.rows[0])):
+            if self.rows[0][index].value in selected_people:
+                color = item[index].fill.start_color.index[2:]
+                score += self.get_color_value(color)
         return score
 
     # Returns an integer representation of a single person's opinion based on the color they put.
