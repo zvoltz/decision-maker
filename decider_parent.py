@@ -28,8 +28,7 @@ def get_file():
 class Decider:
 
     # Given the names of the columns, present the user with a GUI to check which people to consider when making the
-    # decision. Returns a list of boolean values that relate to whether that column should be considered where the
-    # boolean value at i relates to column i+1.
+    # decision. Returns a list of names selected.
     def select_people(self, names):
         layout = [[sg.Text("Check everyone to consider while deciding:")]]
         for x in names:
@@ -44,7 +43,13 @@ class Decider:
                 break
         window.close()
 
-        return list(values.values())
+        include_list = list(values.values())
+        selected_people = []
+        for i in range(len(include_list)):
+            if include_list[i]:
+                selected_people.append(names[i])
+
+        return selected_people
 
     # Returns a list of size max_rating + 1, each initialized as an empty list
     # max_rating + 1 because range is 0 to max_rating
@@ -59,13 +64,12 @@ class Decider:
     # window indicates a single decrease in rank and a single increase in index unless an index has no items to display.
     def show_results(self, items):
         index = 0
-        next_addition = 0
+        next_addition = 1
         while index < len(items):
-            if not items[index]:
-                index += next_addition if index >= 0 else 1
-                continue
-            next_addition = self.show_window(", ".join(items[index]))
+            if items[index]:
+                next_addition = self.show_window(", ".join(items[index]))
             index += next_addition
+            index = index % len(items)
 
     # Given the text to show as string of items, display them as a multiline GUI. Returns either -1 or 1 based on what
     # the user selects. This integer represents whether the integer wants to see the previous index (-1) or next (+1).
