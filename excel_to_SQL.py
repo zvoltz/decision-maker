@@ -53,7 +53,10 @@ def get_data():
     ws = sheet.load_workbook(filename=excel_file).active
     rows = list(ws.rows)
     names = list(rows[0])
-    names.pop(0)
+    for i in range(len(names)):
+        if not names[i].value and i != 0:
+            names = names[1:i]
+            break
     rows.pop(0)
 
 
@@ -65,6 +68,8 @@ def make_database():
 
     # create a column for each person's preferences
     for cell in names:
+        if not cell.value:
+            break
         cursor.execute(f"ALTER TABLE preferences ADD {cell.value} SMALLINT(1);")
 
     # add each item along with everyone's opinion towards that item
@@ -82,10 +87,12 @@ def remove_copy():
 
 def add_row(cursor, row):
     data = ["'" + str(row[0].value) + "'"]
-    numQuestions = "?, " * (len(row))
+    numQuestions = "?, " * (len(names) + 1)
     numQuestions = numQuestions[0:-2]
-    for cell in row[1:]:
-        data.append(str(get_color_value(cell)))
+    for i in range(len(row[1:])):
+        if i == len(names):
+            break
+        data.append(str(get_color_value(row[1:][i])))
     cursor.execute(f"INSERT INTO preferences VALUES ({numQuestions});", data)
 
 
