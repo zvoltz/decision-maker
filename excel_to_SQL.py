@@ -55,8 +55,9 @@ def get_data():
     names = list(rows[0])
     for i in range(len(names)):
         if not names[i].value and i != 0:
-            names = names[1:i]
+            names = names[0:i]
             break
+    names.pop(0)
     rows.pop(0)
 
 
