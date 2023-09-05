@@ -21,7 +21,6 @@ The file should look like this:
 - [x] ~~Change file format to SQL.~~
 - [x] ~~Remove reference to games (generalize to work for all preferences like restaurants).~~
 - [ ] Implement support for comments about each person's preference.
-- [ ] Add support for android.
 - [x] ~~Update README.~~
 - [x] ~~Merge SQL branch.~~
 - [ ] Add way to make a new database from scratch.
