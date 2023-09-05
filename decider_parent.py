@@ -67,15 +67,15 @@ class Decider:
         next_addition = 1
         while index < len(items):
             if items[index]:
-                next_addition = self.show_window(", ".join(items[index]))
+                next_addition = self.show_window(", ".join(items[index]), index)
             index += next_addition
             index = index % len(items)
 
     # Given the text to show as string of items, display them as a multiline GUI. Returns either -1 or 1 based on what
     # the user selects. This integer represents whether the integer wants to see the previous index (-1) or next (+1).
-    def show_window(self, text):
+    def show_window(self, text, index):
         layout = [[sg.Multiline(text, s=(100, 2))], [sg.Button("Back"), sg.Button("Next"), sg.Button("Cancel")]]
-        window = sg.Window("Decision Maker", layout)
+        window = sg.Window(f"Decision Maker {index}", layout)
         event, values = window.read()
         window.close()
         match event:
