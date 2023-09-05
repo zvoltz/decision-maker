@@ -52,12 +52,7 @@ def get_data():
     global names
     ws = sheet.load_workbook(filename=excel_file).active
     rows = list(ws.rows)
-    names = list(rows[0])
-    for i in range(len(names)):
-        if not names[i].value and i != 0:
-            names = names[0:i]
-            break
-    names.pop(0)
+    names = [x.value for x in list(rows[0]) if x is not None and x.value is not None]
     rows.pop(0)
 
 
@@ -68,14 +63,12 @@ def make_database():
     cursor.execute("CREATE TABLE preferences (object_name TEXT)")
 
     # create a column for each person's preferences
-    for cell in names:
-        if not cell.value:
-            break
-        cursor.execute(f"ALTER TABLE preferences ADD {cell.value} SMALLINT(1);")
+    for name in names:
+        cursor.execute(f"ALTER TABLE preferences ADD {name} SMALLINT(1);")
 
     # add each item along with everyone's opinion towards that item
     for row in rows:
-        add_row(cursor, row)
+        add_row(cursor, row[0:len(names)+1])
     connection.commit()
     connection.close()
 
@@ -87,6 +80,8 @@ def remove_copy():
 
 
 def add_row(cursor, row):
+    if row[0].value is None:
+        return
     data = ["'" + str(row[0].value) + "'"]
     numQuestions = "?, " * (len(names) + 1)
     numQuestions = numQuestions[0:-2]
